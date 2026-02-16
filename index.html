@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Explore Kolkata – City of Joy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <style>
+    :root {
+      --bg: #05060a;
+      --card: rgba(18, 20, 28, 0.88);
+      --accent: #ffb347;
+      --accent-soft: rgba(255, 179, 71, 0.16);
+      --text-main: #f7f7ff;
+      --text-muted: #a2a5b9;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --blur: 26px;
+      --radius-xl: 32px;
+      --radius-lg: 24px;
+      --radius-pill: 999px;
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.65);
+      --shadow-chip: 0 10px 30px rgba(0, 0, 0, 0.75);
+      --transition-fast: 200ms ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #161827 0, #05060a 55%);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    /* iPhone-style frame */
+    .app-shell {
+      position: relative;
+      width: 100%;
+      max-width: 430px;
+      height: 100vh;
+      max-height: 932px;
+      background: radial-gradient(circle at top, #141726 0, #05060a 60%);
+      border-radius: 48px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.04),
+        0 40px 120px rgba(0, 0, 0, 0.95);
+      border: 10px solid #000;
+    }
+
+    /* Fake status bar notch area */
+    .status-bar {
+      position: relative;
+      height: 56px;
+      padding: 10px 22px 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .notch {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 8px;
+      width: 168px;
+      height: 26px;
+      border-radius: 0 0 18px 18px;
+      background: #000;
+    }
+
+    .status-icons {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #4cd964;
+    }
+
+    /* Tab bar (bottom) */
+    .tab-bar {
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      right: 0;
+      padding: 0 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      pointer-events: none;
+    }
+
+    .tab-bar-inner {
+      pointer-events: auto;
+      backdrop-filter: blur(var(--blur));
+      -webkit-backdrop-filter: blur(var(--blur));
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.12),
+        rgba(8, 9, 14, 0.6)
+      );
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 6px 12px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .tab-item {
+      flex: 1;
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 6px 6px 4px;
+      border-radius: 999px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background var(--transition-fast), color var(--transition-fast),
+        transform var(--transition-fast);
+    }
+
+    .tab-item span.icon {
+      font-size: 15px;
+      opacity: 0.9;
+    }
+
+    .tab-item.active {
+      background: radial-gradient(circle at top, var(--accent-soft), transparent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .home-indicator {
+      align-self: center;
+      width: 120px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.32);
+    }
+
+    /* Scrollable content */
+    .content-wrapper {
+      position: absolute;
+      inset: 56px 0 70px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: y mandatory;
+      padding: 16px 18px 22px;
+    }
+
+    section {
+      scroll-snap-align: start;
+      min-height: calc(100% - 16px);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 10px 2px 26px;
+    }
+
+    /* Hero card */
+    .hero-card {
+      padding: 18px 18px 16px;
+      border-radius: var(--radius-xl);
+      background: radial-gradient(circle at top left, #262b45, #10121b);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: var(--accent);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .hero-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .hero-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: 90%;
+      line-height: 1.4;
+    }
+
+    .hero-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .chip {
+      font-size: 11px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(5, 6, 10, 0.85);
+      box-shadow: var(--shadow-chip);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-muted);
+    }
+
+    .chip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .hero-orbit {
+      position: absolute;
+      right: -60px;
+      top: -40px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ffdd99, transparent 55%);
+      opacity: 0.18;
+      filter: blur(1px);
+    }
+
+    /* Section titles / layout */
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .section-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .section-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .card-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card {
+      border-radius: var(--radius-lg);
+      background: var(--card);
+      border: 1px solid var(--border-subtle);
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+        border-color var(--transition-fast), background var(--transition-fast);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.04), transparent 55%);
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+      pointer-events: none;
+    }
+
+    .card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.85);
+      border-color: rgba(255, 255, 255, 0.25);
+      background: radial-gradient(circle at top, #1a1d2c, #0c0d14);
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-main {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .card-tagline {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .card-pill {
+      font-size: 10px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(0, 0, 0, 0.4);
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    /* Accordion effect */
+    .card-details {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 260ms ease-out, opacity 260ms ease-out;
+      opacity: 0;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    .card.expanded .card-details {
+      max-height: 200px;
+      opacity: 1;
+    }
+
+    .card.expanded {
+      background: radial-gradient(circle at top, #23263a, #10121b);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .card-chevron {
+      font-size: 14px;
+      color: var(--text-muted);
+      transition: transform var(--transition-fast), color var(--transition-fast);
+    }
+
+    .card.expanded .card-chevron {
+      transform: rotate(90deg);
+      color: var(--accent);
+    }
+
+    /* Utility */
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .pill-small {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-muted);
+    }
+
+    /* Responsive (for desktop preview) */
+    @media (min-width: 900px) {
+      body {
+        padding: 22px 0;
+        background: radial-gradient(circle at top, #191b2e 0, #05060a 55%);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <div class="status-bar">
+      <div>Explore</div>
+      <div class="notch"></div>
+      <div class="status-icons">
+        <div class="status-dot"></div>
+        <span>4G</span>
+        <span>🔋</span>
+      </div>
+    </div>
+
+    <div class="content-wrapper" id="scrollContainer">
+      <!-- HERO / OVERVIEW -->
+      <section id="section-hero">
+        <div class="hero-card">
+          <div class="hero-pill">
+            <span>📍</span>
+            <span>Kolkata, City of Joy</span>
+          </div>
+          <div class="hero-title">Explore Kolkata</div>
+          <div class="hero-subtitle">
+            Swipe through handpicked spots for history, food, shopping, and spirituality—designed like an iPhone experience.
+          </div>
+          <div class="hero-chips">
+            <div class="chip">
+              <span class="chip-dot"></span>
+              Attractions
+            </div>
+            <div class="chip">
+              <span class="chip-dot"></span>
+              Food & Sweets
+            </div>
+            <div class="chip">
+              <span class="chip-dot"></span>
+              Shopping
+            </div>
+            <div class="chip">
+              <span class="chip-dot"></span>
+              Religious Spots
+            </div>
+          </div>
+          <div class="hero-orbit"></div>
+        </div>
+      </section>
+
+      <!-- KEY ATTRACTIONS -->
+      <section id="section-attractions">
+        <div class="section-label">Page 1</div>
+        <div class="section-title-row">
+          <div>
+            <div class="section-title">Key Attractions</div>
+            <div class="section-sub">Landmarks that define Kolkata</div>
+          </div>
+        </div>
+
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Victoria Memorial</div>
+              <div class="card-tagline">Iconic white marble monument & museum</div>
+              <div class="card-details">
+                British-era architecture set in lush gardens, housing paintings, sculptures, and artifacts from the Raj period.
+              </div>
+            </div>
+            <div class="card-pill">Historic</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Park Street & Cemetery</div>
+              <div class="card-tagline">The street that never sleeps</div>
+              <div class="card-details">
+                Lined with legendary restaurants and bars; nearby South Park Street Cemetery dates back to 1767 and feels like a time capsule.
+              </div>
+            </div>
+            <div class="card-pill">Culture</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Indian Museum</div>
+              <div class="card-tagline">India’s oldest & largest museum</div>
+              <div class="card-details">
+                Explore Egyptian mummies, Mughal paintings, ancient sculptures, fossils, and more under one grand colonial roof.
+              </div>
+            </div>
+            <div class="card-pill">Museum</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Princep Ghat & Ganga Sunset</div>
+              <div class="card-tagline">Golden-hour boat rides by the Hooghly</div>
+              <div class="card-details">
+                A riverside promenade with a Palladian-style monument, best enjoyed with a slow boat ride at sunset.
+              </div>
+            </div>
+            <div class="card-pill">Sunset</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Mullick Ghat Flower Market</div>
+              <div class="card-tagline">Asia’s largest flower market</div>
+              <div class="card-details">
+                Beneath Howrah Bridge, mornings explode with marigolds, roses, and vendors—perfect for photos and local chaos.
+              </div>
+            </div>
+            <div class="card-pill">Markets</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Sovabazar Rajbari</div>
+              <div class="card-tagline">Old-world Bengali aristocratic mansion</div>
+              <div class="card-details">
+                Famous for its traditional Durga Puja and architecture that reflects Kolkata’s zamindari heritage.
+              </div>
+            </div>
+            <div class="card-pill">Heritage</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Jorasanko Rajbari</div>
+              <div class="card-tagline">Rabindranath Tagore’s ancestral home</div>
+              <div class="card-details">
+                Now the Rabindra Bharati Museum, it preserves the life, works, and world of Tagore in intimate detail.
+              </div>
+            </div>
+            <div class="card-pill">Culture</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Science City</div>
+              <div class="card-tagline">Interactive science & space experiences</div>
+              <div class="card-details">
+                India’s largest science center with hands-on exhibits, a space theater, and family-friendly attractions.
+              </div>
+            </div>
+            <div class="card-pill">Family</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Maidan & Derby Legacy</div>
+              <div class="card-tagline">Lungs of Kolkata & football hub</div>
+              <div class="card-details">
+                Vast green expanse near Victoria Memorial, home to the legendary East Bengal vs Mohun Bagan football rivalry.
+              </div>
+            </div>
+            <div class="card-pill">Football</div>
+            <div class="card-chevron">›</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- HERITAGE SWEET SHOPS -->
+      <section id="section-sweets">
+        <div class="section-label">Page 2</div>
+        <div class="section-title-row">
+          <div>
+            <div class="section-title">Heritage Sweet Shops</div>
+            <div class="section-sub">Classic Bengali mishti trails</div>
+          </div>
+        </div>
+
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Putiram – College Street</div>
+              <div class="card-tagline">Classic Sandesh near book heaven</div>
+              <div class="card-details">
+                A student and intellectual favourite, serving traditional Bengali sweets with old-world charm.
+              </div>
+            </div>
+            <div class="card-pill">Sandesh</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">K.C. Das</div>
+              <div class="card-tagline">Pioneers of the Rosogolla</div>
+              <div class="card-details">
+                Associated with the invention of the iconic spongy Rosogolla, a must-try for first-time visitors.
+              </div>
+            </div>
+            <div class="card-pill">Rosogolla</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Balaram Mullick</div>
+              <div class="card-tagline">Mishti doi & inventive Sandesh</div>
+              <div class="card-details">
+                Renowned for its rich Mishti Doi and a wide range of beautifully crafted Sandesh varieties.
+              </div>
+            </div>
+            <div class="card-pill">Mishti Doi</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Bancharam’s</div>
+              <div class="card-tagline">Famous for Jolbhora Sandesh</div>
+              <div class="card-details">
+                Known for creative sweets, especially Jolbhora, which literally bursts with syrup when you bite into it.
+              </div>
+            </div>
+            <div class="card-pill">Jolbhora</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Nalin Chandra Das & Sons</div>
+              <div class="card-tagline">Another Rosogolla legend</div>
+              <div class="card-details">
+                A historic sweet-maker with its own Rosogolla legacy and a strong lineup of traditional Bengali mishti.
+              </div>
+            </div>
+            <div class="card-pill">Legacy</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Bhim Nag</div>
+              <div class="card-tagline">Iconic Ledikeni specialist</div>
+              <div class="card-details">
+                Celebrated for Ledikeni, a syrupy fried sweet named after Lady Canning, along with other timeless favourites.
+              </div>
+            </div>
+            <div class="card-pill">Ledikeni</div>
+            <div class="card-chevron">›</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FOOD PLACES -->
+      <section id="section-food">
+        <div class="section-label">Page 3</div>
+        <div class="section-title-row">
+          <div>
+            <div class="section-title">Food Places</div>
+            <div class="section-sub">From Tangra Chinese to street food</div>
+          </div>
+        </div>
+
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Eau Chew – Chandni Chowk</div>
+              <div class="card-tagline">Heritage Chinese family-run spot</div>
+              <div class="card-details">
+                Serves old-school Hakka Chinese in a cosy setting, preserving Kolkata’s original Chinatown flavours.
+              </div>
+            </div>
+            <div class="card-pill">Chinese</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Broadway – Chandni Chowk</div>
+              <div class="card-tagline">OG cabin bar vibes</div>
+              <div class="card-details">
+                A retro bar for drinks, adda, and a heritage feel that throws you back a few decades.
+              </div>
+            </div>
+            <div class="card-pill">Bar</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Golden Joy – Tangra</div>
+              <div class="card-tagline">Classic Indo-Chinese in Tangra</div>
+              <div class="card-details">
+                A favourite in Kolkata’s Chinatown for family dinners with big portions and comforting flavours.
+              </div>
+            </div>
+            <div class="card-pill">Tangra</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Bigg Boss – Tangra</div>
+              <div class="card-tagline">Hearty Chinese-Indian plates</div>
+              <div class="card-details">
+                Known for generous servings and bold flavours that define the city’s Chinese-Indian style.
+              </div>
+            </div>
+            <div class="card-pill">Tangra</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Kusum Rolls – Park Street</div>
+              <div class="card-tagline">Iconic Kathi roll counter</div>
+              <div class="card-details">
+                Famous for rolls like Chicken Reshmi Kebab; quick, messy, and deeply satisfying street-style food.
+              </div>
+            </div>
+            <div class="card-pill">Rolls</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Mitra Cafe – Shyambazar</div>
+              <div class="card-tagline">Legendary Fish Kobiraji</div>
+              <div class="card-details">
+                Serves crispy, lacy-batter Fish Kobiraji—a classic Kolkata-style cutlet experience.
+              </div>
+            </div>
+            <div class="card-pill">Cutlets</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Bedouin Rolls – Gariahat</div>
+              <div class="card-tagline">Creative take on rolls</div>
+              <div class="card-details">
+                Offers both traditional and experimental rolls, perfect after a Gariahat shopping session.
+              </div>
+            </div>
+            <div class="card-pill">Rolls</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Indian Coffee House – College Street</div>
+              <div class="card-tagline">Old-school adda hub</div>
+              <div class="card-details">
+                A cultural landmark where students, thinkers, and artists have gathered for conversations since the 1940s.
+              </div>
+            </div>
+            <div class="card-pill">Iconic</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Paramount Sherbet – College Street</div>
+              <div class="card-tagline">Refreshing sherbets & coolers</div>
+              <div class="card-details">
+                Known for unique sherbets that offer instant relief from Kolkata’s heat.
+              </div>
+            </div>
+            <div class="card-pill">Sherbet</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Trincas – Park Street</div>
+              <div class="card-tagline">Birthplace of Indian Chinese vibes</div>
+              <div class="card-details">
+                A Park Street institution, associated with early Indian-Chinese cuisine and live music.
+              </div>
+            </div>
+            <div class="card-pill">Classic</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Mocambo – Park Street</div>
+              <div class="card-tagline">Vintage continental legend</div>
+              <div class="card-details">
+                Known for dishes like Devil’s Chicken and sizzlers in a dimly lit, old-world setting.
+              </div>
+            </div>
+            <div class="card-pill">Continental</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Floatel</div>
+              <div class="card-tagline">Dining on the Hooghly</div>
+              <div class="card-details">
+                A floating hotel and restaurant that offers serene river views with your meal.
+              </div>
+            </div>
+            <div class="card-pill">Riverside</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Zakaria Street – Street Food</div>
+              <div class="card-tagline">Ramadan food paradise</div>
+              <div class="card-details">
+                Especially electric during Ramadan, with kebabs, biryani, haleem, and more lining the lanes.
+              </div>
+            </div>
+            <div class="card-pill">Street Food</div>
+            <div class="card-chevron">›</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SHOPPING -->
+      <section id="section-shopping">
+        <div class="section-label">Page 4</div>
+        <div class="section-title-row">
+          <div>
+            <div class="section-title">Shopping</div>
+            <div class="section-sub">Sarees, bargains & malls</div>
+          </div>
+        </div>
+
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Gariahat</div>
+              <div class="card-tagline">Busy hub for sarees & streetwear</div>
+              <div class="card-details">
+                Packed with stalls and shops selling Bengali sarees, ethnic wear, and everyday fashion at negotiable prices.
+              </div>
+            </div>
+            <div class="card-pill">Sarees</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Shyambazar & Hatibagan</div>
+              <div class="card-tagline">Traditional Bengali shopping belts</div>
+              <div class="card-details">
+                Great for sarees, dress materials, and budget-friendly local shopping in a classic north Kolkata setting.
+              </div>
+            </div>
+            <div class="card-pill">Street</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Esplanade & New Market</div>
+              <div class="card-tagline">Historic all-in-one bazaar</div>
+              <div class="card-details">
+                Sir Stuart Hogg Market and its surroundings offer clothes, shoes, food, and curios under one sprawling roof.
+              </div>
+            </div>
+            <div class="card-pill">Bazaar</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Metro Plaza</div>
+              <div class="card-tagline">Compact mall-style complex</div>
+              <div class="card-details">
+                A mix of boutiques, fashion stores, and cafes in a central, easy-to-browse layout.
+              </div>
+            </div>
+            <div class="card-pill">Mall</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">South City Mall</div>
+              <div class="card-tagline">Modern mall experience</div>
+              <div class="card-details">
+                Features major brands, a multiplex, and a lively food court—good for a more global retail feel.
+              </div>
+            </div>
+            <div class="card-pill">Lifestyle</div>
+            <div class="card-chevron">›</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RELIGIOUS PLACES -->
+      <section id="section-religion">
+        <div class="section-label">Page 5</div>
+        <div class="section-title-row">
+          <div>
+            <div class="section-title">Religious Places</div>
+            <div class="section-sub">Spiritual anchors of the city</div>
+          </div>
+        </div>
+
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Dakshineswar Temple</div>
+              <div class="card-tagline">Kali temple on the Hooghly</div>
+              <div class="card-details">
+                Built in 1855, associated with Sri Ramakrishna; features nine spires and riverfront ghats.
+              </div>
+            </div>
+            <div class="card-pill">Kali</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Kalighat Temple</div>
+              <div class="card-tagline">One of the 51 Shakti Peethas</div>
+              <div class="card-details">
+                An important pilgrimage site dedicated to Goddess Kali, with a distinctive idol and deep religious significance.
+              </div>
+            </div>
+            <div class="card-pill">Kali</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">St. Paul’s Cathedral</div>
+              <div class="card-tagline">Indo-Gothic colonial church</div>
+              <div class="card-details">
+                Built in 1847, known for stunning stained glass windows, high ceilings, and peaceful lawns.
+              </div>
+            </div>
+            <div class="card-pill">Cathedral</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Shri Baikunthnath Temple</div>
+              <div class="card-tagline">Serene Marble Temple</div>
+              <div class="card-details">
+                Dedicated to Lord Vishnu, with beautiful marble work and a quiet, contemplative atmosphere.
+              </div>
+            </div>
+            <div class="card-pill">Vishnu</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Birla Mandir</div>
+              <div class="card-tagline">Modern architectural temple</div>
+              <div class="card-details">
+                Built by the Birla family, this temple is dedicated to Krishna and Radha, glowing beautifully in the evening.
+              </div>
+            </div>
+            <div class="card-pill">Hindu</div>
+            <div class="card-chevron">›</div>
+          </div>
+
+          <div class="card">
+            <div class="card-main">
+              <div class="card-title">Nakhoda Mosque</div>
+              <div class="card-tagline">Grand mosque of Burrabazar</div>
+              <div class="card-details">
+                Completed in 1926, inspired by Mughal architecture, and one of the largest mosques in the city.
+              </div>
+            </div>
+            <div class="card-pill">Mosque</div>
+            <div class="card-chevron">›</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Bottom Tab Bar -->
+    <div class="tab-bar">
+      <div class="tab-bar-inner">
+        <div class="tab-item active" data-target="section-attractions">
+          <span class="icon">🏛️</span>
+          <span>Attractions</span>
+        </div>
+        <div class="tab-item" data-target="section-food">
+          <span class="icon">🍽️</span>
+          <span>Food</span>
+        </div>
+        <div class="tab-item" data-target="section-shopping">
+          <span class="icon">🛍️</span>
+          <span>Shopping</span>
+        </div>
+        <div class="tab-item" data-target="section-religion">
+          <span class="icon">🕯️</span>
+          <span>Spiritual</span>
+        </div>
+      </div>
+      <div class="home-indicator"></div>
+    </div>
+  </div>
+
+  <script>
+    // Card accordion interaction
+    document.querySelectorAll(".card").forEach(card => {
+      card.addEventListener("click", () => {
+        const already = card.classList.contains("expanded");
+        document.querySelectorAll(".card.expanded").forEach(c => c.classList.remove("expanded"));
+        if (!already) card.classList.add("expanded");
+      });
+    });
+
+    // Tab navigation → scroll to sections
+    const tabs = document.querySelectorAll(".tab-item");
+    const scrollContainer = document.getElementById("scrollContainer");
+
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        const targetId = tab.getAttribute("data-target");
+        const targetEl = document.getElementById(targetId);
+        if (!targetEl) return;
+        tabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        const top = targetEl.offsetTop - scrollContainer.offsetTop;
+        scrollContainer.scrollTo({ top, behavior: "smooth" });
+      });
+    });
+  </script>
+</body>
+</html>
